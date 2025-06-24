@@ -104,4 +104,5 @@ class CasoSoporteServiceTest {
         assertThat(resultado).isEqualTo(casoExistente);
         verify(casoSoporteRepository).findById(3);
     }
+    
 }
