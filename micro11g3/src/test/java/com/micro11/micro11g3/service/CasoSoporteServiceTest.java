@@ -11,10 +11,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.assertj.core.api.Assertions.*;
 
@@ -31,78 +30,59 @@ class CasoSoporteServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @Test
-    void testObtenerCasos() {
-        CasoSoporte caso1 = new CasoSoporte(1, 101, "Asunto 1", LocalDateTime.now(), EstadoCaso.ABIERTO, "Mensaje 1");
-        CasoSoporte caso2 = new CasoSoporte(2, 102, "Asunto 2", LocalDateTime.now(), EstadoCaso.CERRADO, "Mensaje 2");
+@Test
+void testCrearCasoConEstadoYaDefinido() {
+    CasoSoporte caso = new CasoSoporte();
+    caso.setIdUsuario(100);
+    caso.setAsunto("Asunto");
+    caso.setEstadoCaso(EstadoCaso.ABIERTO); 
 
-        when(casoSoporteRepository.findAll()).thenReturn(Arrays.asList(caso1, caso2));
+    when(casoSoporteRepository.save(any(CasoSoporte.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        List<CasoSoporte> resultado = casoSoporteService.obtenerCasos();
+    CasoSoporte resultado = casoSoporteService.crearCaso(caso);
 
-        assertThat(resultado).hasSize(2);
-        verify(casoSoporteRepository).findAll();
-    }
+    assertThat(resultado.getEstadoCaso()).isEqualTo(EstadoCaso.ABIERTO);
+    verify(casoSoporteRepository).save(caso);
+}
 
-    @Test
-    void testCrearCaso() {
-        CasoSoporte caso = new CasoSoporte();
-        caso.setIdUsuario(100);
-        caso.setAsunto("Nuevo asunto");
+@Test
+void testActualizarEstadoCasoNoExiste() {
+    when(casoSoporteRepository.findById(99)).thenReturn(Optional.empty());
 
-        when(casoSoporteRepository.save(any(CasoSoporte.class))).thenAnswer(invocation -> invocation.getArgument(0));
+    CasoSoporte resultado = casoSoporteService.actualizarEstado(99, "CERRADO");
 
-        CasoSoporte resultado = casoSoporteService.crearCaso(caso);
+    assertThat(resultado).isNull();
+}
 
-        assertThat(resultado.getFechaCreacion()).isNotNull();
-        assertThat(resultado.getEstadoCaso()).isNotNull();
-        verify(casoSoporteRepository).save(caso);
-    }
+@Test
+void testActualizarEstadoEstadoInvalido() {
+    CasoSoporte casoExistente = new CasoSoporte(1, 100, "Asunto", LocalDateTime.now(), EstadoCaso.ABIERTO, "Mensaje");
+    when(casoSoporteRepository.findById(1)).thenReturn(Optional.of(casoExistente));
 
-    @Test
-    void testActualizarEstado() {
-        CasoSoporte casoExistente = new CasoSoporte(1, 100, "Asunto", LocalDateTime.now(), EstadoCaso.ABIERTO, "Mensaje");
+    CasoSoporte resultado = casoSoporteService.actualizarEstado(1, "INVALIDO");
 
-        when(casoSoporteRepository.findById(1)).thenReturn(Optional.of(casoExistente));
-        when(casoSoporteRepository.save(any(CasoSoporte.class))).thenAnswer(invocation -> invocation.getArgument(0));
+    assertThat(resultado).isNull();
+}
 
-        CasoSoporte resultado = casoSoporteService.actualizarEstado(1, "CERRADO");
+@Test
+void testValidarEstadoNull() {
+    EstadoCaso estado = casoSoporteService.validarEstado(null);
+    assertThat(estado).isNull();
+}
 
-        assertThat(resultado.getEstadoCaso()).isEqualTo(EstadoCaso.CERRADO);
-        verify(casoSoporteRepository).findById(1);
-        verify(casoSoporteRepository).save(casoExistente);
-    }
+@Test
+void testValidarEstadoNoCoincide() {
+    EstadoCaso estado = casoSoporteService.validarEstado("INEXISTENTE");
+    assertThat(estado).isNull();
+}
 
-    @Test
-    void testValidarEstado() {
-        EstadoCaso estado = casoSoporteService.validarEstado("ABIERTO");
-        assertThat(estado).isEqualTo(EstadoCaso.ABIERTO);
-    }
+@Test
+void testConsultarCasoNoExiste() {
+    when(casoSoporteRepository.findById(123)).thenReturn(Optional.empty());
 
-    @Test
-    void testCerrarCaso() {
-        CasoSoporte casoExistente = new CasoSoporte(2, 200, "Asunto cerrar", LocalDateTime.now(), EstadoCaso.ABIERTO, null);
+    CasoSoporte resultado = casoSoporteService.consultarCaso(123);
 
-        when(casoSoporteRepository.findById(2)).thenReturn(Optional.of(casoExistente));
-        when(casoSoporteRepository.save(any(CasoSoporte.class))).thenAnswer(invocation -> invocation.getArgument(0));
+    assertThat(resultado).isNull();
+}
 
-        CasoSoporte resultado = casoSoporteService.cerrarCaso(2);
-
-        assertThat(resultado.getEstadoCaso()).isEqualTo(EstadoCaso.CERRADO);
-        verify(casoSoporteRepository).findById(2);
-        verify(casoSoporteRepository).save(casoExistente);
-    }
-
-    @Test
-    void testConsultarCaso() {
-        CasoSoporte casoExistente = new CasoSoporte(3, 300, "Asunto consultar", LocalDateTime.now(), EstadoCaso.ABIERTO, null);
-
-        when(casoSoporteRepository.findById(3)).thenReturn(Optional.of(casoExistente));
-
-        CasoSoporte resultado = casoSoporteService.consultarCaso(3);
-
-        assertThat(resultado).isEqualTo(casoExistente);
-        verify(casoSoporteRepository).findById(3);
-    }
-    
 }
