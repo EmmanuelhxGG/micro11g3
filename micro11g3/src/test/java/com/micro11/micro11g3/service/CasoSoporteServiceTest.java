@@ -49,7 +49,7 @@ void testCrearCasoConEstadoYaDefinido() {
 void testActualizarEstadoCasoNoExiste() {
     when(casoSoporteRepository.findById(99)).thenReturn(Optional.empty());
 
-    CasoSoporte resultado = casoSoporteService.actualizarEstado(99, "CERRADO");
+    CasoSoporte resultado = casoSoporteService.actualizarEstadoCaso(99, "CERRADO");
 
     assertThat(resultado).isNull();
 }
@@ -59,7 +59,7 @@ void testActualizarEstadoEstadoInvalido() {
     CasoSoporte casoExistente = new CasoSoporte(1, 100, "Asunto", LocalDateTime.now(), EstadoCaso.ABIERTO, "Mensaje");
     when(casoSoporteRepository.findById(1)).thenReturn(Optional.of(casoExistente));
 
-    CasoSoporte resultado = casoSoporteService.actualizarEstado(1, "INVALIDO");
+    CasoSoporte resultado = casoSoporteService.actualizarEstadoCaso(1, "INVALIDO");
 
     assertThat(resultado).isNull();
 }

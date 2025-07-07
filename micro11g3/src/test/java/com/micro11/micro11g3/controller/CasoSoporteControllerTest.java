@@ -116,7 +116,7 @@ class CasoSoporteControllerTest {
 
         Mockito.when(casoSoporteService.consultarCaso(eq(1)))
                 .thenReturn(actualizado);
-        Mockito.when(casoSoporteService.actualizarEstado(eq(1), eq("RESUELTO")))
+        Mockito.when(casoSoporteService.actualizarEstadoCaso(eq(1), eq("RESUELTO")))
                 .thenReturn(actualizado);
 
         mockMvc.perform(put("/api/casos/actualizarEstado")
@@ -141,7 +141,7 @@ class CasoSoporteControllerTest {
         CasoSoporte existente = crearCasoEjemplo(1, EstadoCaso.ABIERTO);
 
         Mockito.when(casoSoporteService.consultarCaso(eq(1))).thenReturn(existente);
-        Mockito.when(casoSoporteService.actualizarEstado(eq(1), eq("INVALIDO")))
+        Mockito.when(casoSoporteService.actualizarEstadoCaso(eq(1), eq("INVALIDO")))
                 .thenReturn(null);
 
         mockMvc.perform(put("/api/casos/actualizarEstado")

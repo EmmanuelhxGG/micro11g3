@@ -28,7 +28,7 @@
             return casoSoporteRepository.save(caso);
         }
 
-        public CasoSoporte actualizarEstado(int idCaso, String nuevoEstadoStr) {
+        public CasoSoporte actualizarEstadoCaso(int idCaso, String nuevoEstadoStr) {
             CasoSoporte caso = casoSoporteRepository.findById(idCaso).orElse(null);
             if (caso == null) {
                 return null;
@@ -57,7 +57,7 @@
 
 
         public CasoSoporte cerrarCaso(int idCaso) {
-            return actualizarEstado(idCaso, "CERRADO");
+            return actualizarEstadoCaso(idCaso, "CERRADO");
         }
 
         public CasoSoporte consultarCaso(int idCaso) {

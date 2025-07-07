@@ -66,7 +66,7 @@ public class CasoSoporteController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-        CasoSoporte casoActualizado = casoSoporteService.actualizarEstado(request.idCaso, request.nuevoEstado);
+        CasoSoporte casoActualizado = casoSoporteService.actualizarEstadoCaso(request.idCaso, request.nuevoEstado);
         if (casoActualizado == null) {
             
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
